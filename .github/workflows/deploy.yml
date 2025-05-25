@@ -35,6 +35,11 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         
+    - name: Build description-parser module
+      run: |
+        cd description-parser
+        ../mvnw clean install -DskipTests -B
+        
     - name: Build backend
       run: |
         cd backend
