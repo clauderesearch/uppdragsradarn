@@ -1,0 +1,236 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: registry.digitalocean.com
+  REPOSITORY: uppdragsradarn
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Run tests
+      run: |
+        cd backend
+        ./mvnw clean test
+        
+    - name: Run linting
+      run: |
+        cd backend
+        ./mvnw spotless:check
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+        
+    - name: Run linting
+      run: |
+        cd frontend
+        npm run lint
+        
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+
+  test-admin:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: admin/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd admin
+        npm ci
+        
+    - name: Run linting
+      run: |
+        cd admin
+        npm run lint
+        
+    - name: Build admin
+      run: |
+        cd admin
+        npm run build
+
+  build-and-push:
+    needs: [test-backend, test-frontend, test-admin]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Log in to DigitalOcean Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        
+    - name: Build and push backend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/backend:${{ github.sha }}
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/backend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Build and push frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/frontend:${{ github.sha }}
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/frontend:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Build and push admin
+      uses: docker/build-push-action@v5
+      with:
+        context: ./admin
+        push: true
+        tags: |
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/admin:${{ github.sha }}
+          ${{ env.REGISTRY }}/${{ env.REPOSITORY }}/admin:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  deploy-dev:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: development
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        
+    - name: Save DigitalOcean kubeconfig
+      run: doctl kubernetes cluster kubeconfig save ${{ secrets.K8S_CLUSTER_ID }}
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.5.7
+        
+    - name: Terraform Init
+      working-directory: ./terraform/environments/dev
+      run: |
+        terraform init \
+          -backend-config="access_key=${{ secrets.SPACES_ACCESS_KEY }}" \
+          -backend-config="secret_key=${{ secrets.SPACES_SECRET_KEY }}"
+          
+    - name: Terraform Apply
+      working-directory: ./terraform/environments/dev
+      run: |
+        terraform apply -auto-approve \
+          -var="do_token=${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" \
+          -var="aws_cognito_domain=${{ secrets.AWS_COGNITO_DOMAIN }}" \
+          -var="aws_cognito_client_id=${{ secrets.AWS_COGNITO_CLIENT_ID }}" \
+          -var="aws_cognito_client_secret=${{ secrets.AWS_COGNITO_CLIENT_SECRET }}" \
+          -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}" \
+          -var="db_password=${{ secrets.DB_PASSWORD }}" \
+          -var="backend_image=${{ env.REGISTRY }}/${{ env.REPOSITORY }}/backend:${{ github.sha }}" \
+          -var="frontend_image=${{ env.REGISTRY }}/${{ env.REPOSITORY }}/frontend:${{ github.sha }}" \
+          -var="admin_image=${{ env.REGISTRY }}/${{ env.REPOSITORY }}/admin:${{ github.sha }}" \
+          -var="domain=dev.uppdragsradarn.se"
+
+  deploy-prod:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        
+    - name: Save DigitalOcean kubeconfig
+      run: doctl kubernetes cluster kubeconfig save ${{ secrets.K8S_CLUSTER_ID }}
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.5.7
+        
+    - name: Terraform Init
+      working-directory: ./terraform/environments/prod
+      run: |
+        terraform init \
+          -backend-config="access_key=${{ secrets.SPACES_ACCESS_KEY }}" \
+          -backend-config="secret_key=${{ secrets.SPACES_SECRET_KEY }}"
+          
+    - name: Terraform Apply
+      working-directory: ./terraform/environments/prod
+      run: |
+        terraform apply -auto-approve \
+          -var="do_token=${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" \
+          -var="aws_cognito_domain=${{ secrets.AWS_COGNITO_DOMAIN }}" \
+          -var="aws_cognito_client_id=${{ secrets.AWS_COGNITO_CLIENT_ID_PROD }}" \
+          -var="aws_cognito_client_secret=${{ secrets.AWS_COGNITO_CLIENT_SECRET_PROD }}" \
+          -var="openai_api_key=${{ secrets.OPENAI_API_KEY }}" \
+          -var="db_password=${{ secrets.DB_PASSWORD_PROD }}" \
+          -var="backend_image=${{ env.REGISTRY }}/${{ env.REPOSITORY }}/backend:${{ github.sha }}" \
+          -var="frontend_image=${{ env.REGISTRY }}/${{ env.REPOSITORY }}/frontend:${{ github.sha }}" \
+          -var="admin_image=${{ env.REGISTRY }}/${{ env.REPOSITORY }}/admin:${{ github.sha }}" \
+          -var="domain=uppdragsradarn.se"
