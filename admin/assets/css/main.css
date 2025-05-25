@@ -1,0 +1,72 @@
+/* Global styles to prevent scrollbar issues */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Default colors */
+html {
+  background-color: #fbfaf9;
+  color: #337b4c;
+}
+
+html.dark {
+  background-color: #001915;
+  color: #ffffff;
+}
+
+/* Accessibility enhancements */
+/* Default to no-js, plugins will add js class */
+html {
+  font-size: 100%; /* Ensures text can be resized */
+}
+
+/* Default class for no-js state */
+html.nojs .js-only {
+  display: none !important;
+}
+
+/* Enhanced focus styles for keyboard users */
+body.keyboard-user *:focus {
+  outline: 3px solid #337b4c !important;
+  outline-offset: 2px !important;
+}
+
+/* Enhanced focus styles for tabindex elements */
+[tabindex="0"]:focus-visible {
+  outline: 2px solid #337b4c;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(51, 123, 76, 0.2);
+}
+
+/* Skip links styling */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  padding: 8px;
+  z-index: 100;
+  background: white;
+  color: #337b4c;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Fix for potential overflow issues in flex containers */
+.flex-container {
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Make sure main content is not causing overflow */
+main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}

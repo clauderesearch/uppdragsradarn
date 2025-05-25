@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="v2-create-sources" author="claude">
+        <comment>Create initial sources for crawlers</comment>
+
+        <!-- Create Emagine source -->
+        <insert tableName="sources">
+            <column name="id" value="aaaaaaaa-1111-1111-1111-111111111111"/>
+            <column name="name" value="Emagine"/>
+            <column name="base_url" value="https://www.emagine.se"/>
+            <column name="source_type_id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="parameters" valueComputed="'{}'::jsonb"/>
+        </insert>
+
+        <!-- Create A Society Group source -->
+        <insert tableName="sources">
+            <column name="id" value="aaaaaaaa-2222-2222-2222-222222222222"/>
+            <column name="name" value="A Society Group"/>
+            <column name="base_url" value="https://asocietygroup.se"/>
+            <column name="source_type_id" value="55555555-5555-5555-5555-555555555555"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="parameters" valueComputed="'{}'::jsonb"/>
+        </insert>
+
+        <!-- Create Ework source -->
+        <insert tableName="sources">
+            <column name="id" value="aaaaaaaa-3333-3333-3333-333333333333"/>
+            <column name="name" value="Ework"/>
+            <column name="base_url" value="https://www.eworkgroup.com"/>
+            <column name="source_type_id" value="66666666-6666-6666-6666-666666666666"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="parameters" valueComputed="'{}'::jsonb"/>
+        </insert>
+
+        <!-- Create Experis source -->
+        <insert tableName="sources">
+            <column name="id" value="aaaaaaaa-4444-4444-4444-444444444444"/>
+            <column name="name" value="Experis"/>
+            <column name="base_url" value="https://www.experis.se"/>
+            <column name="source_type_id" value="77777777-7777-7777-7777-777777777777"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="parameters" valueComputed="'{}'::jsonb"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,152 @@
+package com.uppdragsradarn.parser;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
+
+public class GenericDescriptionProcessorTest {
+    
+    private GenericDescriptionProcessor processor;
+    
+    @BeforeEach
+    void setUp() {
+        processor = new GenericDescriptionProcessor();
+    }
+    
+    @Test
+    void shouldProcessEworkDescription() {
+        String eworkDescription = """
+            💻 Ework Group - founded in 2000, listed on Nasdaq Stockholm, with around 13,000 independent professionals on assignment - we are the total talent solutions provider who partners with clients, in both the private and public sector, and professionals to create sustainable talent supply chains.
+            
+            🔹 For our Client we are looking for **ServiceNow Solution Developer** 🔹
+            
+            Are you passionate about AI and developing transformative solutions within ServiceNow? Join an innovative ServiceNow team in Digital, Data & IT, working with dedicated professionals to enhance patient care through advanced technology. Read more and apply today for a life-changing career.
+            
+            **✔️As a ServiceNow Solution Developer, responsibilities will include:**
+            
+            • Designing and implementing ServiceNow solutions, specializing in AI, by leveraging both standard features and custom integrations with Azure OpenAI and other AI tools.
+            • Developing robust integration frameworks to seamlessly connect ServiceNow with external platforms and tools.
+            • Providing guidance and an AI framework to internal and external developers for configuring AI solutions in ServiceNow.
+            
+            **✔️Qualifications:**
+            
+            • Over 6 years of experience in the IT industry with a strong background in developing and integrating solutions.
+            • More than 4 years of hands-on developer experience with ServiceNow.
+            • Proficient in JavaScript and skilled in writing, reviewing, and optimizing code effectively.
+            
+            **✔️ We offer:**
+            
+            • B2B agreement
+            • Transparent working conditions with both Ework and the client
+            • Current support during our cooperation
+            • Possibility to work in an international environment
+            
+            Contact person: monika. jozwik@eworkgroup. com
+            Client code: HNN01
+            Do you know someone who would fit this position? Recommend a candidate by sending her/his CV to: polecenia@eworkgroup. com
+            """;
+        
+        String title = "ServiceNow Solution Developer";
+        
+        String result = processor.process(eworkDescription, title, "ework");
+        
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("# ServiceNow Solution Developer");
+        assertThat(result).contains("## Role Overview");
+        assertThat(result).contains("## Key Responsibilities");
+        assertThat(result).contains("## Requirements");
+        assertThat(result).contains("## What We Offer");
+        assertThat(result).doesNotContain("Client code:");
+        assertThat(result).doesNotContain("Contact person:");
+        assertThat(result).doesNotContain("💻");
+        assertThat(result).doesNotContain("🔹");
+        assertThat(result).doesNotContain("✔️");
+    }
+    
+    @Test
+    void shouldProcessAssocietyDescription() {
+        String associetyDescription = """
+            **Position:** New Senior Software Engineer Göteborg Engineering On site Full time 3 hours ago 
+            **Company:** A Society Group 
+            **Location:** Stockholm 
+            For more details about this position, please visit the job listing: https://www.asocietygroup.com/en/uppdrag/senior-software-engineer-13440
+            """;
+        
+        String title = "New Senior Software Engineer Göteborg Engineering On site Full time 3 hours ago";
+        
+        String result = processor.process(associetyDescription, title, "asociety");
+        
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("# Senior Software Engineer");
+        assertThat(result).doesNotContain("Göteborg");
+        assertThat(result).doesNotContain("3 hours ago");
+        assertThat(result).contains("Full Details:");
+        assertThat(result).contains("https://www.asocietygroup.com");
+    }
+    
+    @Test
+    void shouldHandleEmptyDescription() {
+        String result = processor.process("");
+        
+        assertThat(result).isEmpty();
+    }
+    
+    @Test
+    void shouldHandleNullDescription() {
+        String result = processor.process(null);
+        
+        assertThat(result).isEmpty();
+    }
+    
+    @Test
+    void shouldProcessWithoutProviderHints() {
+        String genericDescription = """
+            About the Role:
+            We are seeking an experienced Java Developer to join our dynamic team.
+            
+            Responsibilities:
+            - Design and develop high-quality software solutions
+            - Collaborate with cross-functional teams
+            - Participate in code reviews
+            
+            Requirements:
+            - 5+ years of Java experience  
+            - Strong understanding of software design patterns
+            - Experience with Spring Framework
+            
+            Benefits:
+            - Competitive salary
+            - Flexible work arrangements
+            - Health insurance
+            """;
+        
+        String result = processor.process(genericDescription, "Java Developer");
+        
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("# Java Developer");
+        assertThat(result).contains("## Role Overview");
+        assertThat(result).contains("## Key Responsibilities");
+        assertThat(result).contains("## Requirements");
+        assertThat(result).contains("## What We Offer");
+    }
+    
+    @Test
+    void shouldApplyFallbacksForMissingRequiredSections() {
+        String minimalDescription = """
+            We have an exciting opportunity for a talented developer.
+            
+            Benefits:
+            - Great salary
+            - Remote work
+            """;
+        
+        String result = processor.process(minimalDescription);
+        
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("## Role Overview");
+        assertThat(result).contains("## Key Responsibilities");
+        assertThat(result).contains("Key responsibilities will be discussed during the interview process");
+        assertThat(result).contains("## Requirements");
+        assertThat(result).contains("We are looking for motivated professionals with relevant experience");
+    }
+}

@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="v1-schema-5nf" author="claude">
+        <comment>Create complete 5NF database schema</comment>
+        
+        <!-- Required Extensions -->
+        <sql>CREATE EXTENSION IF NOT EXISTS "uuid-ossp"</sql>
+        <sql>CREATE EXTENSION IF NOT EXISTS "pgcrypto"</sql>
+        <sql>CREATE EXTENSION IF NOT EXISTS "pg_trgm"</sql>
+        
+        <!-- 1. Common Types and Reference Tables -->
+        
+        <!-- Skills Table -->
+        <createTable tableName="skills">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_skills"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_skills_name"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- Source Types Table -->
+        <createTable tableName="source_types">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_source_types"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_source_types_name"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- Status Types Table -->
+        <createTable tableName="status_types">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_status_types"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="status_types" 
+                            columnNames="name, entity_type" 
+                            constraintName="uk_status_types_name_entity"/>
+        
+        <!-- Currencies Table -->
+        <createTable tableName="currencies">
+            <column name="code" type="VARCHAR(3)">
+                <constraints primaryKey="true" primaryKeyName="pk_currencies"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="symbol" type="VARCHAR(5)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- 2. Core Entity Tables -->
+        
+        <!-- Sources Table -->
+        <createTable tableName="sources">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_sources"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_sources_name"/>
+            </column>
+            <column name="base_url" type="VARCHAR(255)"/>
+            <column name="source_type_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_sources_source_type" references="source_types(id)"/>
+            </column>
+            <column name="configuration" type="TEXT"/>
+            <column name="parameters" type="JSONB"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_sources_parameters" tableName="sources">
+            <column name="parameters" type="JSONB"/>
+        </createIndex>
+        
+        <!-- Roles Table -->
+        <createTable tableName="roles">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_roles"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_roles_name"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- Users Table -->
+        <createTable tableName="users">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_users_email"/>
+            </column>
+            <column name="cognito_id" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="uk_users_cognito_id"/>
+            </column>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="notification_email_enabled" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="subscription_tier" type="VARCHAR(50)" defaultValue="FREE"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- Locations Hierarchy -->
+        
+        <!-- Location Types Table -->
+        <createTable tableName="location_types">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_location_types"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_location_types_name"/>
+            </column>
+            <column name="hierarchy_level" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- Locations Table -->
+        <createTable tableName="locations">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_locations"/>
+            </column>
+            <column name="city" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="region" type="VARCHAR(255)"/>
+            <column name="country_code" type="VARCHAR(2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country_name" type="VARCHAR(255)"/>
+            <column name="location_type_id" type="UUID">
+                <constraints foreignKeyName="fk_locations_type" references="location_types(id)"/>
+            </column>
+            <column name="latitude" type="DOUBLE PRECISION"/>
+            <column name="longitude" type="DOUBLE PRECISION"/>
+            <column name="population" type="INTEGER"/>
+            <column name="geoname_id" type="BIGINT"/>
+            <column name="is_remote_friendly" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="locations" 
+                            columnNames="city, region, country_code" 
+                            constraintName="uk_locations_city_region_country"/>
+        <createIndex indexName="idx_locations_city" tableName="locations">
+            <column name="city"/>
+        </createIndex>
+        <createIndex indexName="idx_locations_country_code" tableName="locations">
+            <column name="country_code"/>
+        </createIndex>
+        <createIndex indexName="idx_locations_geoname_id" tableName="locations">
+            <column name="geoname_id"/>
+        </createIndex>
+        <createIndex indexName="idx_locations_coordinates" tableName="locations">
+            <column name="latitude"/>
+            <column name="longitude"/>
+        </createIndex>
+        
+        <!-- Location Aliases Table -->
+        <createTable tableName="location_aliases">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_location_aliases"/>
+            </column>
+            <column name="alias_text" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_text" type="VARCHAR(255)"/>
+            <column name="source_provider" type="VARCHAR(255)"/>
+            <column name="match_confidence" type="FLOAT"/>
+            <column name="manual_match" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="location_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_location_aliases_location" references="locations(id)"/>
+            </column>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_location_aliases_alias_text" tableName="location_aliases">
+            <column name="alias_text"/>
+        </createIndex>
+        <createIndex indexName="idx_location_aliases_source" tableName="location_aliases">
+            <column name="source_provider"/>
+        </createIndex>
+        <!-- Remove trigram index for now to allow schema creation -->
+        <!-- <sql>CREATE INDEX idx_location_aliases_text_trgm ON location_aliases USING GIN (alias_text gin_trgm_ops)</sql> -->
+        
+        <!-- Assignments Table -->
+        <createTable tableName="assignments">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_assignments"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="company_name" type="VARCHAR(255)"/>
+            <column name="remote_percentage" type="INTEGER"/>
+            <column name="duration_months" type="INTEGER"/>
+            <column name="start_date" type="DATE"/>
+            <column name="hourly_rate_min" type="DECIMAL(10, 2)"/>
+            <column name="hourly_rate_max" type="DECIMAL(10, 2)"/>
+            <column name="currency_code" type="VARCHAR(3)">
+                <constraints foreignKeyName="fk_assignments_currency" references="currencies(code)"/>
+            </column>
+            <column name="hours_per_week" type="INTEGER"/>
+            <column name="application_deadline" type="DATE"/>
+            <column name="application_url" type="VARCHAR(1024)"/>
+            <column name="source_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_assignments_source" references="sources(id)"/>
+            </column>
+            <column name="external_id" type="VARCHAR(255)"/>
+            <column name="status_id" type="UUID">
+                <constraints foreignKeyName="fk_assignments_status" references="status_types(id)"/>
+            </column>
+            <column name="needs_manual_review" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="pii_detected" type="TEXT"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="assignments" 
+                            columnNames="source_id, external_id" 
+                            constraintName="uk_assignments_source_external_id"/>
+        <createIndex indexName="idx_assignments_source" tableName="assignments">
+            <column name="source_id"/>
+        </createIndex>
+        <createIndex indexName="idx_assignments_status" tableName="assignments">
+            <column name="status_id"/>
+        </createIndex>
+        <createIndex indexName="idx_assignment_active_created" tableName="assignments">
+            <column name="active"/>
+            <column name="created_at"/>
+        </createIndex>
+        
+        <!-- 3. Junction Tables -->
+        
+        <!-- User Roles Junction Table -->
+        <createTable tableName="user_roles">
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_roles_user" references="users(id)"/>
+            </column>
+            <column name="role_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_roles_role" references="roles(id)"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="user_roles" columnNames="user_id, role_id" constraintName="pk_user_roles"/>
+        <createIndex indexName="idx_user_role_user" tableName="user_roles">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_user_role_role" tableName="user_roles">
+            <column name="role_id"/>
+        </createIndex>
+        
+        <!-- Assignment Skills Junction Table -->
+        <createTable tableName="assignment_skills">
+            <column name="assignment_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_assignment_skills_assignment" references="assignments(id)"/>
+            </column>
+            <column name="skill_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_assignment_skills_skill" references="skills(id)"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="assignment_skills" columnNames="assignment_id, skill_id" constraintName="pk_assignment_skills"/>
+        <createIndex indexName="idx_assignment_skills_assignment" tableName="assignment_skills">
+            <column name="assignment_id"/>
+        </createIndex>
+        <createIndex indexName="idx_assignment_skills_skill" tableName="assignment_skills">
+            <column name="skill_id"/>
+        </createIndex>
+        
+        <!-- Assignment Locations Junction Table -->
+        <createTable tableName="assignment_locations">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_assignment_locations"/>
+            </column>
+            <column name="assignment_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_assignment_locations_assignment" references="assignments(id)"/>
+            </column>
+            <column name="location_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_assignment_locations_location" references="locations(id)"/>
+            </column>
+            <column name="original_text" type="VARCHAR(255)"/>
+            <column name="is_remote" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="remote_percentage" type="INTEGER"/>
+            <column name="is_primary" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_assignment_locations_assignment" tableName="assignment_locations">
+            <column name="assignment_id"/>
+        </createIndex>
+        <createIndex indexName="idx_assignment_locations_location" tableName="assignment_locations">
+            <column name="location_id"/>
+        </createIndex>
+        <createIndex indexName="idx_assignment_locations_is_primary" tableName="assignment_locations">
+            <column name="is_primary"/>
+        </createIndex>
+        
+        <!-- User Assignments Junction Table -->
+        <createTable tableName="user_assignments">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" primaryKeyName="pk_user_assignments"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_assignments_user" references="users(id)"/>
+            </column>
+            <column name="assignment_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_user_assignments_assignment" references="assignments(id)"/>
+            </column>
+            <column name="status_id" type="UUID">
+                <constraints foreignKeyName="fk_user_assignments_status" references="status_types(id)"/>
+            </column>
+            <column name="notes" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="user_assignments" 
+                            columnNames="user_id, assignment_id" 
+                            constraintName="uk_user_assignments_user_assignment"/>
+        <createIndex indexName="idx_user_assignment_user" tableName="user_assignments">
+            <column name="user_id"/>
+        </createIndex>
+        <createIndex indexName="idx_user_assignment_assignment" tableName="user_assignments">
+            <column name="assignment_id"/>
+        </createIndex>
+        <createIndex indexName="idx_user_assignment_status" tableName="user_assignments">
+            <column name="status_id"/>
+        </createIndex>
+        
+        <!-- 4. Operational Tables -->
+        
+        <!-- Crawler Job Executions Table -->
+        <createTable tableName="crawler_job_executions">
+            <column name="id" type="VARCHAR(50)">
+                <constraints primaryKey="true" primaryKeyName="pk_crawler_job_executions"/>
+            </column>
+            <column name="source_id" type="UUID">
+                <constraints foreignKeyName="fk_crawler_jobs_source" references="sources(id)"/>
+            </column>
+            <column name="source_name" type="VARCHAR(255)"/>
+            <column name="start_time" type="TIMESTAMP"/>
+            <column name="end_time" type="TIMESTAMP"/>
+            <column name="status_id" type="UUID">
+                <constraints foreignKeyName="fk_crawler_jobs_status" references="status_types(id)"/>
+            </column>
+            <column name="assignments_found" type="INTEGER"/>
+            <column name="assignments_created" type="INTEGER"/>
+            <column name="assignments_updated" type="INTEGER"/>
+            <column name="processed_assignment_ids" type="TEXT"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_crawler_jobs_source_id" tableName="crawler_job_executions">
+            <column name="source_id"/>
+        </createIndex>
+        <createIndex indexName="idx_crawler_jobs_start_time" tableName="crawler_job_executions">
+            <column name="start_time" descending="true"/>
+        </createIndex>
+        <createIndex indexName="idx_crawler_jobs_status" tableName="crawler_job_executions">
+            <column name="status_id"/>
+        </createIndex>
+        
+        <!-- 5. Initial Data Setup -->
+        
+        <!-- Currency Data -->
+        <insert tableName="currencies">
+            <column name="code" value="SEK"/>
+            <column name="name" value="Swedish Krona"/>
+            <column name="symbol" value="kr"/>
+        </insert>
+        <insert tableName="currencies">
+            <column name="code" value="EUR"/>
+            <column name="name" value="Euro"/>
+            <column name="symbol" value="€"/>
+        </insert>
+        <insert tableName="currencies">
+            <column name="code" value="USD"/>
+            <column name="name" value="US Dollar"/>
+            <column name="symbol" value="$"/>
+        </insert>
+        <insert tableName="currencies">
+            <column name="code" value="GBP"/>
+            <column name="name" value="British Pound"/>
+            <column name="symbol" value="£"/>
+        </insert>
+        <insert tableName="currencies">
+            <column name="code" value="NOK"/>
+            <column name="name" value="Norwegian Krone"/>
+            <column name="symbol" value="kr"/>
+        </insert>
+        <insert tableName="currencies">
+            <column name="code" value="DKK"/>
+            <column name="name" value="Danish Krone"/>
+            <column name="symbol" value="kr"/>
+        </insert>
+        
+        <!-- Source Types -->
+        <insert tableName="source_types">
+            <column name="id" value="11111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="EMAIL"/>
+        </insert>
+        <insert tableName="source_types">
+            <column name="id" value="22222222-2222-2222-2222-222222222222"/>
+            <column name="name" value="WEB_SCRAPER"/>
+        </insert>
+        <insert tableName="source_types">
+            <column name="id" value="33333333-3333-3333-3333-333333333333"/>
+            <column name="name" value="API"/>
+        </insert>
+        <insert tableName="source_types">
+            <column name="id" value="44444444-4444-4444-4444-444444444444"/>
+            <column name="name" value="EMAGINE"/>
+        </insert>
+        <insert tableName="source_types">
+            <column name="id" value="55555555-5555-5555-5555-555555555555"/>
+            <column name="name" value="ASOCIETYGROUP"/>
+        </insert>
+        <insert tableName="source_types">
+            <column name="id" value="66666666-6666-6666-6666-666666666666"/>
+            <column name="name" value="EWORK"/>
+        </insert>
+        <insert tableName="source_types">
+            <column name="id" value="77777777-7777-7777-7777-777777777777"/>
+            <column name="name" value="EXPERIS"/>
+        </insert>
+        
+        <!-- Status Types -->
+        <!-- Assignment Statuses -->
+        <insert tableName="status_types">
+            <column name="id" value="a1111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="ACTIVE"/>
+            <column name="entity_type" value="ASSIGNMENT"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="a2222222-2222-2222-2222-222222222222"/>
+            <column name="name" value="EXPIRED"/>
+            <column name="entity_type" value="ASSIGNMENT"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="a3333333-3333-3333-3333-333333333333"/>
+            <column name="name" value="FILLED"/>
+            <column name="entity_type" value="ASSIGNMENT"/>
+        </insert>
+        
+        <!-- User Assignment Statuses -->
+        <insert tableName="status_types">
+            <column name="id" value="b1111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="SAVED"/>
+            <column name="entity_type" value="USER_ASSIGNMENT"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="b2222222-2222-2222-2222-222222222222"/>
+            <column name="name" value="APPLIED"/>
+            <column name="entity_type" value="USER_ASSIGNMENT"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="b3333333-3333-3333-3333-333333333333"/>
+            <column name="name" value="INTERVIEW"/>
+            <column name="entity_type" value="USER_ASSIGNMENT"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="b4444444-4444-4444-4444-444444444444"/>
+            <column name="name" value="ACCEPTED"/>
+            <column name="entity_type" value="USER_ASSIGNMENT"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="b5555555-5555-5555-5555-555555555555"/>
+            <column name="name" value="REJECTED"/>
+            <column name="entity_type" value="USER_ASSIGNMENT"/>
+        </insert>
+        
+        <!-- Crawler Job Statuses -->
+        <insert tableName="status_types">
+            <column name="id" value="c1111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="SUCCESS"/>
+            <column name="entity_type" value="CRAWLER_JOB"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="c2222222-2222-2222-2222-222222222222"/>
+            <column name="name" value="FAILED"/>
+            <column name="entity_type" value="CRAWLER_JOB"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="c3333333-3333-3333-3333-333333333333"/>
+            <column name="name" value="TIMEOUT"/>
+            <column name="entity_type" value="CRAWLER_JOB"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="c4444444-4444-4444-4444-444444444444"/>
+            <column name="name" value="RUNNING"/>
+            <column name="entity_type" value="CRAWLER_JOB"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="c5555555-5555-5555-5555-555555555555"/>
+            <column name="name" value="SCHEDULED"/>
+            <column name="entity_type" value="CRAWLER_JOB"/>
+        </insert>
+        <insert tableName="status_types">
+            <column name="id" value="c6666666-6666-6666-6666-666666666666"/>
+            <column name="name" value="CANCELLED"/>
+            <column name="entity_type" value="CRAWLER_JOB"/>
+        </insert>
+        
+        <!-- Location Types -->
+        <insert tableName="location_types">
+            <column name="id" value="d1111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="COUNTRY"/>
+            <column name="hierarchy_level" value="1"/>
+        </insert>
+        <insert tableName="location_types">
+            <column name="id" value="d2222222-2222-2222-2222-222222222222"/>
+            <column name="name" value="REGION"/>
+            <column name="hierarchy_level" value="2"/>
+        </insert>
+        <insert tableName="location_types">
+            <column name="id" value="d3333333-3333-3333-3333-333333333333"/>
+            <column name="name" value="CITY"/>
+            <column name="hierarchy_level" value="3"/>
+        </insert>
+        
+        <!-- Roles -->
+        <insert tableName="roles">
+            <column name="id" value="e1111111-1111-1111-1111-111111111111"/>
+            <column name="name" value="USER"/>
+            <column name="description" value="Regular user with basic access"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="e2222222-2222-2222-2222-222222222222"/>
+            <column name="name" value="ADMIN"/>
+            <column name="description" value="Administrative user with full access"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

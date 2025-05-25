@@ -1,0 +1,33 @@
+providerId: "asociety"
+baseUrl: "https://www.asocietygroup.com"
+
+contentFilter:
+  contentSelector: "main, .job-content, .content"
+  excludeSelectors:
+    - ".navigation"
+    - ".sidebar"
+    - ".header"
+    - ".footer"
+    - ".menu"
+    - "nav"
+    - "script"
+    - "style"
+  removeTags:
+    - "script"
+    - "style"
+    - "noscript"
+    - "iframe"
+  maxTokens: 1800
+  useReadability: true
+
+llmConfig:
+  model: "gpt-4o-mini"
+  temperature: 0.1
+  maxResponseTokens: 800
+  customInstructions: |
+    This is A Society Group, a Swedish consulting company.
+    Job descriptions may be in English but focus on Swedish market.
+    Work arrangements are often hybrid or remote.
+
+metadataSelectors:
+  workArrangement: "[data-work-arrangement]"

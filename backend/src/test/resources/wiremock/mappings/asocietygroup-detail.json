@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/sv/uppdrag/.*-13376"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "asocietygroup/detail_page.html",
+    "headers": {
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  }
+}

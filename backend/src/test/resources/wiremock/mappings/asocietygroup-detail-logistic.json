@@ -1,0 +1,13 @@
+{
+  "request": {
+    "url": "/sv/uppdrag/logistic-project-manager-projektplanering-och-logistik-i-hybridroll-13387",
+    "method": "GET"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "asocietygroup/detail/logistic-project-manager.html",
+    "headers": {
+      "Content-Type": "text/html;charset=utf-8"
+    }
+  }
+}

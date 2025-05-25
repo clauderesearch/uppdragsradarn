@@ -1,0 +1,9 @@
+# Robots.txt for Uppdragsradarn
+
+User-agent: *
+Allow: /
+Disallow: /profile/
+Disallow: /auth/
+
+# Sitemap location
+Sitemap: https://uppdragsradarn.se/sitemap.xml

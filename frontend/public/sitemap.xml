@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Homepage -->
+  <url>
+    <loc>https://uppdragsradarn.se/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <!-- Alternate language versions -->
+    <xhtml:link rel="alternate" hreflang="sv" href="https://uppdragsradarn.se/?locale=sv"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://uppdragsradarn.se/?locale=en"/>
+  </url>
+  
+  <!-- Login page -->
+  <url>
+    <loc>https://uppdragsradarn.se/login</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+    <!-- Alternate language versions -->
+    <xhtml:link rel="alternate" hreflang="sv" href="https://uppdragsradarn.se/login?locale=sv"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://uppdragsradarn.se/login?locale=en"/>
+  </url>
+  
+  <!-- Note: Assignment detail pages are not included in this static sitemap -->
+  <!-- In a real implementation, you would dynamically generate the sitemap -->
+  <!-- to include all active assignment detail pages -->
+</urlset>

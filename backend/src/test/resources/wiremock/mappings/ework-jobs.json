@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/public/job-requests",
+    "queryParameters": {
+      "page": {
+        "matches": ".*"
+      },
+      "size": {
+        "matches": ".*"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "ework/sample_response.json"
+  }
+}

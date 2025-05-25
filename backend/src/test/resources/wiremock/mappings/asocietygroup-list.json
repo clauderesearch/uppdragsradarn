@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/sv/uppdrag"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "asocietygroup/list_page.html",
+    "headers": {
+      "Content-Type": "text/html; charset=UTF-8"
+    }
+  }
+}

@@ -1,0 +1,315 @@
+{
+  "content": [
+    {
+      "systemId": "JR-41768",
+      "startDate": "2025-05-19",
+      "endDate": "2026-05-19",
+      "locations": [
+        {
+          "city": "Stockholm",
+          "country": "Sweden",
+          "countryCode": "SWE",
+          "suggestedPhoneCode": "SE",
+          "name": "Stockholm, Sweden",
+          "locationId": "here:cm:namedplace:20627780",
+          "coordinates": {
+            "lat": 59.3293,
+            "lon": 18.0686
+          }
+        }
+      ],
+      "brokerFee": {
+        "description": null,
+        "percentage": null
+      },
+      "firstDayOfApplications": "2025-05-09T10:49:37.57378+02:00",
+      "lastDayOfApplications": "2025-05-31T23:59:00+02:00",
+      "skills": [
+        {
+          "skill": {
+            "name": "Java",
+            "id": 2001,
+            "signature": "r92WBw8sgv4Y1L3lGEq4rriwtWu3LZ910BdxPeGTvU/3YFUXavJw4qqitXlFMq04"
+          },
+          "priority": "REQUIRED",
+          "id": 435955,
+          "signature": "HsJ+uv2uH/y381nHhYStqenvHaOspfzBwnPSbXXhYkj3VPAL0Qt0Aiw/5nXqS7S4ZsXcTxIvtRaWQvbdz/S/YQ",
+          "createdDate": "2025-05-09T10:49:37.604468+02:00",
+          "modifiedDate": "2025-05-09T10:49:37.604468+02:00",
+          "createdBy": null,
+          "modifiedBy": null
+        },
+        {
+          "skill": {
+            "name": "Spring Boot",
+            "id": 1593,
+            "signature": "obeChiXPsLx5bTcMSHdAM7iwtWu3LZ910BdxPeGTvU/3YFUXavJw4qqitXlFMq04"
+          },
+          "priority": "REQUIRED",
+          "id": 435958,
+          "signature": "j/qu5n8WuM/3kEW8UaesQenvHaOspfzBwnPSbXXhYkj3VPAL0Qt0Aiw/5nXqS7S4ZsXcTxIvtRaWQvbdz/S/YQ",
+          "createdDate": "2025-05-09T10:49:37.608545+02:00",
+          "modifiedDate": "2025-05-09T10:49:37.608545+02:00",
+          "createdBy": null,
+          "modifiedBy": null
+        },
+        {
+          "skill": {
+            "name": "SQL",
+            "id": 1161,
+            "signature": "1FUS8cZtvq172ybv3oORlbiwtWu3LZ910BdxPeGTvU/3YFUXavJw4qqitXlFMq04"
+          },
+          "priority": "REQUIRED",
+          "id": 435954,
+          "signature": "ClhXbgEyPckbz5zXpqfL4envHaOspfzBwnPSbXXhYkj3VPAL0Qt0Aiw/5nXqS7S4ZsXcTxIvtRaWQvbdz/S/YQ",
+          "createdDate": "2025-05-09T10:49:37.602848+02:00",
+          "modifiedDate": "2025-05-09T10:49:37.602848+02:00",
+          "createdBy": null,
+          "modifiedBy": null
+        }
+      ],
+      "company": null,
+      "remoteness": 75,
+      "hoursPerWeek": 40.0,
+      "alreadyApplied": false,
+      "favourite": false,
+      "promoteClient": false,
+      "clientLegalEntityId": 2145,
+      "administratorLegalEntityId": 5,
+      "client": null,
+      "rate": {
+        "currency": "SEK",
+        "maxRate": 800.00,
+        "clientRateType": "HOURLY"
+      },
+      "level": "SENIOR",
+      "legalEntityClient": {
+        "id": 2145,
+        "publicProfileId": null,
+        "publicProfileSlug": null,
+        "publicProfileName": null,
+        "name": "Test Client AB",
+        "aboutUs": null,
+        "aboutUsFlavorText": null,
+        "logoSystemId": null,
+        "logoPublicUrl": null,
+        "backgroundImageSystemId": null,
+        "backgroundImagePublicUrl": null,
+        "vatNumber": "SE123456789001",
+        "country": "SE"
+      },
+      "administratorLegalEntityClient": {
+        "id": 5,
+        "publicProfileId": 26,
+        "publicProfileSlug": "EworkGroup",
+        "publicProfileName": "Ework Group",
+        "name": "Ework Group AB",
+        "aboutUs": "<p>Ework Group description</p>",
+        "aboutUsFlavorText": "Ework Group is a market-leading competence provider",
+        "logoSystemId": "M29iygpunyHVxSCgvi39qXyc6c6Jfksg",
+        "logoPublicUrl": "https://example.com/logo.png",
+        "backgroundImageSystemId": "kUr2LodZsSMuD4psnu5EYEd7MER6mIdq",
+        "backgroundImagePublicUrl": "https://example.com/banner.png",
+        "vatNumber": "SE123456789",
+        "country": "SE"
+      },
+      "distributionDate": null,
+      "id": 67247,
+      "signature": "TXwh4HR3ABuG5gWpuhjWwxB6ONTk5cONW3RMht907djv4uDUW5yzOMKdpAGKIxg8kM357v3qInsRvlsUomJznA",
+      "createdDate": "2025-05-09T10:49:37.593037+02:00",
+      "modifiedDate": "2025-05-09T10:49:37.593037+02:00",
+      "origin": {
+        "systemId": "T1NWSnJEV0A3TlU6SXNYJHEsMmBITjFBIE15ZnU6I1AgV3BDfitjJTQ0JjJfNn0r",
+        "systemOwner": "NOVA",
+        "name": "Ework Group AB",
+        "publicProfileId": 1,
+        "publicProfileSlug": "ework",
+        "details": {
+          "color": "#4B8997",
+          "logo": "https://app.verama.com/cdn/verama/logo-e.png",
+          "vatNumber": "SE123456789",
+          "homePageLink": "www.eworkgroup.com"
+        },
+        "logoSystemId": null,
+        "backgroundImageSystemId": null,
+        "aboutUs": null,
+        "aboutUsFlavorText": null,
+        "id": 6,
+        "signature": "RmixvXGeoxBiktcuvb+ynnNWaojlZ55ildgo3wbXK0rlf60LvoRNW/9N0+KwAiW7JxiYRAd4He8sDl3MXGclIA",
+        "createdDate": "2023-07-29T06:00:00+02:00",
+        "modifiedDate": "2023-05-27T19:09:03.714443+02:00"
+      },
+      "title": "Senior Java Developer",
+      "status": "OPEN",
+      "public": true
+    },
+    {
+      "systemId": "JR-42898",
+      "startDate": "2025-08-01",
+      "endDate": "2026-07-31",
+      "locations": [
+        {
+          "city": "Gothenburg",
+          "country": "Sweden",
+          "countryCode": "SWE",
+          "suggestedPhoneCode": "SE",
+          "name": "Gothenburg, Sweden",
+          "locationId": "here:cm:namedplace:20422915",
+          "coordinates": {
+            "lat": 57.7089,
+            "lon": 11.9746
+          }
+        }
+      ],
+      "brokerFee": {
+        "description": null,
+        "percentage": null
+      },
+      "firstDayOfApplications": "2025-05-09T10:46:44.433896+02:00",
+      "lastDayOfApplications": "2025-05-23T11:00:00+02:00",
+      "skills": [
+        {
+          "skill": {
+            "name": "React",
+            "id": 2954,
+            "signature": "DokEWqtOvza50eK6YIN0nfDwjaMtlDUxGwzmHSVJsan3YFUXavJw4qqitXlFMq04"
+          },
+          "priority": "REQUIRED",
+          "id": 435952,
+          "signature": "aQiWKSGkEcJFJWPzcOQjm/ch4Cu90okleWP88bpoWlX3VPAL0Qt0Aiw/5nXqS7S4ZsXcTxIvtRaWQvbdz/S/YQ",
+          "createdDate": "2025-05-09T10:46:44.466675+02:00",
+          "modifiedDate": "2025-05-09T10:46:44.466675+02:00",
+          "createdBy": null,
+          "modifiedBy": null
+        },
+        {
+          "skill": {
+            "name": "Javascript",
+            "id": 698,
+            "signature": "ryI5jp9I9TZzyZCeUWwwpvDwjaMtlDUxGwzmHSVJsan3YFUXavJw4qqitXlFMq04"
+          },
+          "priority": "REQUIRED",
+          "id": 435951,
+          "signature": "PSnzSBcPPus7A65NqCTFs/ch4Cu90okleWP88bpoWlX3VPAL0Qt0Aiw/5nXqS7S4ZsXcTxIvtRaWQvbdz/S/YQ",
+          "createdDate": "2025-05-09T10:46:44.465126+02:00",
+          "modifiedDate": "2025-05-09T10:46:44.465126+02:00",
+          "createdBy": null,
+          "modifiedBy": null
+        },
+        {
+          "skill": {
+            "name": "TypeScript",
+            "id": 1042,
+            "signature": "OJlil6LUmtsnvs0EYPO/x/DwjaMtlDUxGwzmHSVJsan3YFUXavJw4qqitXlFMq04"
+          },
+          "priority": "REQUIRED",
+          "id": 435953,
+          "signature": "7UBimFH08khFZwEKVSDjvvch4Cu90okleWP88bpoWlX3VPAL0Qt0Aiw/5nXqS7S4ZsXcTxIvtRaWQvbdz/S/YQ",
+          "createdDate": "2025-05-09T10:46:44.468078+02:00",
+          "modifiedDate": "2025-05-09T10:46:44.468078+02:00",
+          "createdBy": null,
+          "modifiedBy": null
+        }
+      ],
+      "company": null,
+      "remoteness": 50,
+      "hoursPerWeek": 40.0,
+      "alreadyApplied": false,
+      "favourite": false,
+      "promoteClient": false,
+      "clientLegalEntityId": 2012,
+      "administratorLegalEntityId": 4,
+      "client": null,
+      "rate": {
+        "currency": "SEK",
+        "maxRate": 750.00,
+        "clientRateType": "HOURLY"
+      },
+      "level": "SENIOR",
+      "legalEntityClient": {
+        "id": 2012,
+        "publicProfileId": null,
+        "publicProfileSlug": null,
+        "publicProfileName": null,
+        "name": "Another Client AB",
+        "aboutUs": null,
+        "aboutUsFlavorText": null,
+        "logoSystemId": null,
+        "logoPublicUrl": null,
+        "backgroundImageSystemId": null,
+        "backgroundImagePublicUrl": null,
+        "vatNumber": "SE987654321",
+        "country": "SE"
+      },
+      "administratorLegalEntityClient": {
+        "id": 4,
+        "publicProfileId": 24,
+        "publicProfileSlug": "EworkGroup",
+        "publicProfileName": "Ework Group",
+        "name": "Ework Group AB",
+        "aboutUs": "<p>Ework Group description</p>",
+        "aboutUsFlavorText": "Ework Group is a market-leading competence provider",
+        "logoSystemId": "QRu5hjND7rgXlLsL6lvhQDiR65ciZoZT",
+        "logoPublicUrl": "https://example.com/logo.png",
+        "backgroundImageSystemId": "iNHDh5eTkqxlCYA7o6oSJj1474U3hIxh",
+        "backgroundImagePublicUrl": "https://example.com/banner.png",
+        "vatNumber": "SE123456789",
+        "country": "SE"
+      },
+      "distributionDate": null,
+      "id": 67246,
+      "signature": "q1KQHPYq/804PlCCkZVoBhB6ONTk5cONW3RMht907djv4uDUW5yzOMKdpAGKIxg8kM357v3qInsRvlsUomJznA",
+      "createdDate": "2025-05-09T10:46:44.453609+02:00",
+      "modifiedDate": "2025-05-09T10:46:44.453609+02:00",
+      "origin": {
+        "systemId": "T1NESVtxIjcnTFFfLDp5KVhhQ11EIHZtMFtKVy00QHlAWlQ_ZXh7KnpYSnNcMEsq",
+        "systemOwner": "NOVA",
+        "name": "Ework Group AB",
+        "publicProfileId": 1,
+        "publicProfileSlug": "ework",
+        "details": {
+          "color": "#4B8997",
+          "logo": "https://app.verama.com/cdn/verama/logo-e.png",
+          "vatNumber": "SE123456789",
+          "homePageLink": "www.eworkgroup.com"
+        },
+        "logoSystemId": null,
+        "backgroundImageSystemId": null,
+        "aboutUs": null,
+        "aboutUsFlavorText": null,
+        "id": 5,
+        "signature": "rD5e2G5tHCocQN54El7FCCkwoG2WncbWdZNi1Z+WFCrlf60LvoRNW/9N0+KwAiW7JxiYRAd4He8sDl3MXGclIA",
+        "createdDate": "2023-07-29T06:00:00+02:00",
+        "modifiedDate": "2023-05-27T19:09:03.676355+02:00"
+      },
+      "title": "Frontend Developer",
+      "status": "OPEN",
+      "public": true
+    }
+  ],
+  "pageable": {
+    "sort": {
+      "empty": false,
+      "unsorted": false,
+      "sorted": true
+    },
+    "offset": 0,
+    "pageNumber": 0,
+    "pageSize": 2,
+    "paged": true,
+    "unpaged": false
+  },
+  "totalElements": 2,
+  "totalPages": 1,
+  "last": true,
+  "number": 0,
+  "sort": {
+    "empty": false,
+    "unsorted": false,
+    "sorted": true
+  },
+  "size": 2,
+  "first": true,
+  "numberOfElements": 2,
+  "empty": false
+}

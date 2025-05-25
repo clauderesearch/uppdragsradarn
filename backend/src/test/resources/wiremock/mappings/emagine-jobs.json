@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/wp-content/themes/emagine-theme/ajax/api-country.php",
+    "headers": {
+      "Content-Type": {
+        "contains": "application/x-www-form-urlencoded"
+      },
+      "X-Requested-With": {
+        "contains": "XMLHttpRequest"
+      }
+    },
+    "bodyPatterns": [
+      {
+        "contains": "action=get_jobs_by_country"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "wp-content/themes/emagine-theme/ajax/api-country-response.html",
+    "headers": {
+      "Content-Type": "text/html; charset=UTF-8",
+      "Access-Control-Allow-Origin": "*"
+    }
+  }
+}

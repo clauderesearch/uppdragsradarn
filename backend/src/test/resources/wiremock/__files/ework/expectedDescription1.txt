@@ -1,0 +1,27 @@
+POSITION
+Senior Java Developer - Microservices
+
+LOCATION
+Stockholm, Sweden
+
+START DATE
+2024-04-01
+
+END DATE
+2024-12-31
+
+REQUIRED SKILLS
+• Java
+• Spring Boot
+• Microservices
+• Docker
+• Kubernetes
+
+REMOTE WORK
+80%
+
+RATE
+900 SEK/hour
+
+HOURS PER WEEK
+40

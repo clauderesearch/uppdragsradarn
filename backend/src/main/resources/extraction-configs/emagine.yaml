@@ -1,0 +1,37 @@
+providerId: "emagine"
+baseUrl: "https://emagine-consulting.se"
+
+contentFilter:
+  contentSelector: ".container .content-section"
+  excludeSelectors:
+    - ".sidebar"
+    - ".navigation"
+    - ".header"
+    - ".footer"
+    - ".advertisement"
+    - ".social-media"
+    - "script"
+    - "style"
+    - ".cookie-banner"
+  removeTags:
+    - "script"
+    - "style"
+    - "noscript"
+    - "svg"
+  maxTokens: 2000
+  useReadability: true
+
+llmConfig:
+  model: "gpt-4o-mini"
+  temperature: 0.1
+  maxResponseTokens: 800
+  customInstructions: |
+    Focus on extracting Swedish consulting job details. 
+    Pay attention to rates in SEK, locations in Sweden, and Swedish company names.
+    Skills are often listed with technologies and tools.
+
+metadataSelectors:
+  title: ".consultants-list-title"
+  company: ".consultants-list-tagline"
+  category: ".consultants-list-category"
+  location: ".consultants-list-customer"

@@ -1,0 +1,32 @@
+{
+  "jobs": [
+    {
+      "jobId": "b7d6ede8-d4a2-4412-a1a7-88f60779ef7a",
+      "title": "Tetra Pak - Service Management Consultant",
+      "client": "Tetra Pak",
+      "location": "Lund, Sweden",
+      "description": "Tetra Pak is revolutionizing its digital landscape with the Next Chapter Systems Platform (NCSP) Program, implementing SAP S/4 HANA to modernize services. Are you ready to take on a key role in shaping this transformation? You will implement SAP best practices and standards while collaborating with cross-functional teams to deliver high-quality solutions. If you are passionate about optimizing processes and driving innovation, this is your chance to be part of something transformative!",
+      "publishedOn": "2025-05-08T14:21:39",
+      "expiresOn": "2025-06-07T21:59:59",
+      "categories": ["SAP", "Service Management", "Digital Transformation"],
+      "employmentType": "Consultant Assignment, 12 months",
+      "slug": "tetra-pak-service-management-lund-experis-academy-"
+    },
+    {
+      "jobId": "a5c4bde2-b3a1-5523-b2b6-77e50668de8b",
+      "title": "Senior Full Stack Developer",
+      "client": "Major Tech Company",
+      "location": "Stockholm, Sweden",
+      "description": "We're looking for a senior Full Stack Developer to join our dynamic team developing cutting-edge web applications. The ideal candidate has experience with both frontend and backend technologies, can architect complex systems, and has a passion for clean, maintainable code. This role offers the opportunity to work with the latest technologies in a collaborative team environment.",
+      "publishedOn": "2025-05-07T09:30:00",
+      "expiresOn": "2025-06-10T23:59:59",
+      "categories": ["JavaScript", "React", "Node.js", "AWS", "TypeScript"],
+      "employmentType": "Consultant Assignment, 6 months",
+      "slug": "senior-full-stack-developer-stockholm"
+    }
+  ],
+  "pageNumber": 1,
+  "pageSize": 2,
+  "totalItems": 2,
+  "totalPages": 1
+}

@@ -1,0 +1,64 @@
+# Test configuration
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  
+  liquibase:
+    enabled: false
+  
+  # Disable Elasticsearch and OAuth2 autoconfiguration in tests
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration
+  
+  docker:
+    compose:
+      enabled: false
+  
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://localhost:8888/test"
+      client:
+        registration:
+          cognito:
+            client-id: ${COGNITO_APP_CLIENT_ID:test-app-client-id}
+            client-secret: test-client-secret
+            scope: openid,email,phone
+            redirect-uri: "{baseUrl}/login/oauth2/code/cognito"
+            client-name: Cognito
+            authorization-grant-type: authorization_code
+        provider:
+          cognito:
+            issuer-uri: http://localhost:8888/test
+            user-name-attribute: email
+
+# Custom application test properties
+app:
+  crawler:
+    schedule: "0 */30 * * * *"  # Every 30 minutes for testing
+    timeout: 5                  # Low timeout for tests
+    user-agent: "TestUserAgent"
+    max-assignments: 20         # Lower limit for tests
+    auto-index: true
+    init-on-startup: true
+  rate-limiting:
+    enabled: false              # Disable rate-limiting for tests
+
+# Test environment variables for security configuration
+COGNITO_REGION: eu-west-1
+COGNITO_USER_POOL_ID: test-user-pool-id
+COGNITO_APP_CLIENT_ID: test-app-client-id

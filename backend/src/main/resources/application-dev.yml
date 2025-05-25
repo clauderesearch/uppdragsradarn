@@ -1,0 +1,55 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  security:
+    oauth2:
+      client:
+        registration:
+          cognito:
+            redirect-uri: "https://dev.uppdragsradarn.se/login/oauth2/code/{registrationId}"
+          cognito-admin:
+            redirect-uri: "https://dev.uppdragsradarn.se/login/oauth2/code/{registrationId}"
+  redis:
+    host: dev.uppdragsradarn.se
+    port: 6379
+    password: ${REDIS_PASSWORD:}
+  session:
+    store-type: redis
+    redis:
+      namespace: uppdragsradarn:dev:session
+      flush-mode: on-save
+  docker:
+    compose:
+      enabled: true
+      start:
+        skip: never
+
+server:
+  servlet:
+    session:
+      cookie:
+        name: JSESSIONID
+        domain: dev.uppdragsradarn.se
+        path: /
+        http-only: true
+        secure: true
+        max-age: 3600
+
+logging:
+  level:
+    com.uppdragsradarn: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.cors: DEBUG
+
+app:
+  frontend:
+    url: https://dev.uppdragsradarn.se
+    admin-url: https://dev.uppdragsradarn.se/admin
+  allowed-origins:
+    - https://dev.uppdragsradarn.se
+  cookie-domain: dev.uppdragsradarn.se
+  crawler:
+    enabled: true
+    scheduleEnabled: true
+    init-on-startup: true
