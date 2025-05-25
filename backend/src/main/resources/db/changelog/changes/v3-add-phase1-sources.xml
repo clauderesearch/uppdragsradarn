@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="v3-1" author="clauderesearch">
+        <comment>Add Phase 1 provider sources</comment>
+        
+        <!-- Add Developers Bay source -->
+        <insert tableName="sources">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Developers Bay"/>
+            <column name="base_url" value="https://developersbay.se"/>
+            <column name="source_type_id" valueComputed="(SELECT id FROM source_types WHERE name = 'WEB_SCRAPER')"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="crawler_class" value="com.uppdragsradarn.infrastructure.crawler.providers.DevelopersBayProvider"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        
+        <!-- Add Interim Search source -->
+        <insert tableName="sources">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Interim Search"/>
+            <column name="base_url" value="https://www.interimsearch.com"/>
+            <column name="source_type_id" valueComputed="(SELECT id FROM source_types WHERE name = 'WEB_SCRAPER')"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="crawler_class" value="com.uppdragsradarn.infrastructure.crawler.providers.InterimSearchProvider"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        
+        <!-- Add Biolit source -->
+        <insert tableName="sources">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Biolit"/>
+            <column name="base_url" value="https://biolit.se"/>
+            <column name="source_type_id" valueComputed="(SELECT id FROM source_types WHERE name = 'WEB_SCRAPER')"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="crawler_class" value="com.uppdragsradarn.infrastructure.crawler.providers.BiolitProvider"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+        
+        <!-- Add Konsultfabriken source -->
+        <insert tableName="sources">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Konsultfabriken"/>
+            <column name="base_url" value="https://www.konsultfabriken.se"/>
+            <column name="source_type_id" valueComputed="(SELECT id FROM source_types WHERE name = 'WEB_SCRAPER')"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="crawler_class" value="com.uppdragsradarn.infrastructure.crawler.providers.KonsultfabrikenProvider"/>
+            <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+            <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="v3-2" author="clauderesearch">
+        <comment>Configure Phase 1 provider parameters</comment>
+        
+        <!-- Developers Bay configuration -->
+        <update tableName="sources">
+            <column name="parameters" value='{"listingUrl": "https://developersbay.se/tillgangliga-offentliga-uppdrag/", "requiresJavaScript": true}'/>
+            <where>name = 'Developers Bay'</where>
+        </update>
+        
+        <!-- Interim Search configuration -->
+        <update tableName="sources">
+            <column name="parameters" value='{"listingUrl": "https://www.interimsearch.com/publika-uppdrag/", "requiresJavaScript": false}'/>
+            <where>name = 'Interim Search'</where>
+        </update>
+        
+        <!-- Biolit configuration -->
+        <update tableName="sources">
+            <column name="parameters" value='{"listingUrl": "https://biolit.se/konsultuppdrag/", "requiresJavaScript": true}'/>
+            <where>name = 'Biolit'</where>
+        </update>
+        
+        <!-- Konsultfabriken configuration -->
+        <update tableName="sources">
+            <column name="parameters" value='{"listingUrl": "https://www.konsultfabriken.se/all-assignments.php", "requiresJavaScript": false}'/>
+            <where>name = 'Konsultfabriken'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

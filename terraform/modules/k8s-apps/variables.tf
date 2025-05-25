@@ -77,13 +77,13 @@ variable "backend_image" {
   type        = string
 }
 
-variable "frontend_image" {
-  description = "Frontend Docker image"
+variable "frontend_bucket_domain" {
+  description = "Frontend Spaces bucket domain"
   type        = string
 }
 
-variable "admin_image" {
-  description = "Admin Docker image"
+variable "admin_bucket_domain" {
+  description = "Admin Spaces bucket domain"
   type        = string
 }
 
@@ -91,16 +91,4 @@ variable "backend_replicas" {
   description = "Number of backend replicas"
   type        = number
   default     = 2
-}
-
-variable "frontend_replicas" {
-  description = "Number of frontend replicas"
-  type        = number
-  default     = 2
-}
-
-variable "admin_replicas" {
-  description = "Number of admin replicas"
-  type        = number
-  default     = 1
 }

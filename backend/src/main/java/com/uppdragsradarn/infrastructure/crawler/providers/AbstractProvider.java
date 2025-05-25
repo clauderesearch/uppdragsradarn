@@ -29,7 +29,7 @@ public abstract class AbstractProvider implements ContentProvider {
     try {
       // Pre-load assignments to avoid lazy loading issues
       source.getAssignments().size();
-      
+
       // Fetch and parse assignments
       List<Assignment> assignments = fetchAndParse(source);
       logger.info(

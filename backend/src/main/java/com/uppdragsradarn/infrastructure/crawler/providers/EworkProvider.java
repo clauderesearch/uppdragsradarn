@@ -343,17 +343,23 @@ public class EworkProvider extends AbstractProvider {
                   return skillRepository.save(newSkill);
                 } catch (Exception e) {
                   // If save fails (likely due to unique constraint), try to find it again
-                  return skillRepository.findByNameIgnoreCase(skillName)
-                      .orElseThrow(() -> new RuntimeException(
-                          "Failed to create or find skill: " + skillName, e));
+                  return skillRepository
+                      .findByNameIgnoreCase(skillName)
+                      .orElseThrow(
+                          () ->
+                              new RuntimeException(
+                                  "Failed to create or find skill: " + skillName, e));
                 }
               });
     } catch (Exception e) {
       logger.warn("Error in findOrCreateSkill for skill {}: {}", skillName, e.getMessage());
       // Last attempt - try to get by name one more time
-      return skillRepository.findByNameIgnoreCase(skillName)
-          .orElseThrow(() -> new RuntimeException(
-              "Failed to create or find skill after retrying: " + skillName, e));
+      return skillRepository
+          .findByNameIgnoreCase(skillName)
+          .orElseThrow(
+              () ->
+                  new RuntimeException(
+                      "Failed to create or find skill after retrying: " + skillName, e));
     }
   }
 

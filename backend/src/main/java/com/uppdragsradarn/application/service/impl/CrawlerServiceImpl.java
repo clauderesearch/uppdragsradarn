@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uppdragsradarn.application.service.AssignmentService;

@@ -15,5 +15,8 @@
     
     <!-- Include source data changelog file -->
     <include file="db/changelog/changes/v2-create-sources.xml"/>
+    
+    <!-- Include Phase 1 provider sources -->
+    <include file="db/changelog/changes/v3-add-phase1-sources.xml"/>
 
 </databaseChangeLog>

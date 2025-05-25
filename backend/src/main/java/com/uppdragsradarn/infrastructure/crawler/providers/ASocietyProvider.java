@@ -6,7 +6,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
-// Most regex imports removed - only keeping JOB_LINK_PATTERN for URL extraction
 import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
@@ -43,7 +42,8 @@ public class ASocietyProvider extends AbstractProvider {
       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
   // DEPRECATED: Regex patterns replaced by LLM extraction
-  private static final java.util.regex.Pattern JOB_LINK_PATTERN = java.util.regex.Pattern.compile("/en/uppdrag/([^\"/?]+)");
+  private static final java.util.regex.Pattern JOB_LINK_PATTERN =
+      java.util.regex.Pattern.compile("/en/uppdrag/([^\"/?]+)");
 
   @Value("${app.crawler.asocietygroup.use-playwright:true}")
   private boolean usePlaywright;
@@ -348,17 +348,23 @@ public class ASocietyProvider extends AbstractProvider {
                   return skillRepository.save(newSkill);
                 } catch (Exception e) {
                   // If save fails (likely due to unique constraint), try to find it again
-                  return skillRepository.findByNameIgnoreCase(skillName)
-                      .orElseThrow(() -> new RuntimeException(
-                          "Failed to create or find skill: " + skillName, e));
+                  return skillRepository
+                      .findByNameIgnoreCase(skillName)
+                      .orElseThrow(
+                          () ->
+                              new RuntimeException(
+                                  "Failed to create or find skill: " + skillName, e));
                 }
               });
     } catch (Exception e) {
       log.warn("Error in findOrCreateSkill for skill {}: {}", skillName, e.getMessage());
       // Last attempt - try to get by name one more time
-      return skillRepository.findByNameIgnoreCase(skillName)
-          .orElseThrow(() -> new RuntimeException(
-              "Failed to create or find skill after retrying: " + skillName, e));
+      return skillRepository
+          .findByNameIgnoreCase(skillName)
+          .orElseThrow(
+              () ->
+                  new RuntimeException(
+                      "Failed to create or find skill after retrying: " + skillName, e));
     }
   }
 
@@ -385,17 +391,23 @@ public class ASocietyProvider extends AbstractProvider {
                   return currencyRepository.save(newCurrency);
                 } catch (Exception e) {
                   // If save fails (likely due to unique constraint), try to find it again
-                  return currencyRepository.findByCode(code)
-                      .orElseThrow(() -> new RuntimeException(
-                          "Failed to create or find currency: " + code, e));
+                  return currencyRepository
+                      .findByCode(code)
+                      .orElseThrow(
+                          () ->
+                              new RuntimeException(
+                                  "Failed to create or find currency: " + code, e));
                 }
               });
     } catch (Exception e) {
       logger.warn("Error in findOrCreateCurrency for code {}: {}", code, e.getMessage());
       // Last attempt - try to get by code one more time
-      return currencyRepository.findByCode(code)
-          .orElseThrow(() -> new RuntimeException(
-              "Failed to create or find currency after retrying: " + code, e));
+      return currencyRepository
+          .findByCode(code)
+          .orElseThrow(
+              () ->
+                  new RuntimeException(
+                      "Failed to create or find currency after retrying: " + code, e));
     }
   }
 
@@ -447,21 +459,36 @@ public class ASocietyProvider extends AbstractProvider {
           .orElseGet(
               () -> {
                 try {
-                  StatusType newStatus = StatusType.builder().name(name).entityType(entityType).build();
+                  StatusType newStatus =
+                      StatusType.builder().name(name).entityType(entityType).build();
                   return statusTypeRepository.save(newStatus);
                 } catch (Exception e) {
                   // If save fails (likely due to unique constraint), try to find it again
-                  return statusTypeRepository.findByNameAndEntityType(name, entityType)
-                      .orElseThrow(() -> new RuntimeException(
-                          "Failed to create or find status type: " + name + ":" + entityType, e));
+                  return statusTypeRepository
+                      .findByNameAndEntityType(name, entityType)
+                      .orElseThrow(
+                          () ->
+                              new RuntimeException(
+                                  "Failed to create or find status type: "
+                                      + name
+                                      + ":"
+                                      + entityType,
+                                  e));
                 }
               });
     } catch (Exception e) {
       logger.warn("Error in getOrCreateStatusType for {}:{}: {}", name, entityType, e.getMessage());
       // Last attempt - try to get by name and type one more time
-      return statusTypeRepository.findByNameAndEntityType(name, entityType)
-          .orElseThrow(() -> new RuntimeException(
-              "Failed to create or find status type after retrying: " + name + ":" + entityType, e));
+      return statusTypeRepository
+          .findByNameAndEntityType(name, entityType)
+          .orElseThrow(
+              () ->
+                  new RuntimeException(
+                      "Failed to create or find status type after retrying: "
+                          + name
+                          + ":"
+                          + entityType,
+                      e));
     }
   }
 }

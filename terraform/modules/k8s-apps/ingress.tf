@@ -7,6 +7,8 @@ resource "kubernetes_ingress_v1" "app" {
       "nginx.ingress.kubernetes.io/proxy-body-size" = "50m"
       "nginx.ingress.kubernetes.io/proxy-read-timeout" = "600"
       "nginx.ingress.kubernetes.io/proxy-send-timeout" = "600"
+      "nginx.ingress.kubernetes.io/whitelist-source-range" = "37.46.168.212/32"
+      "nginx.ingress.kubernetes.io/ssl-redirect" = "true"
     }
   }
 
@@ -42,9 +44,9 @@ resource "kubernetes_ingress_v1" "app" {
           
           backend {
             service {
-              name = kubernetes_service.admin.metadata[0].name
+              name = kubernetes_service.frontend_proxy.metadata[0].name
               port {
-                number = 3000
+                number = 80
               }
             }
           }
@@ -56,9 +58,9 @@ resource "kubernetes_ingress_v1" "app" {
           
           backend {
             service {
-              name = kubernetes_service.frontend.metadata[0].name
+              name = kubernetes_service.frontend_proxy.metadata[0].name
               port {
-                number = 3000
+                number = 80
               }
             }
           }

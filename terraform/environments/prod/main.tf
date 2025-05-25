@@ -25,6 +25,14 @@ module "redis" {
   environment = var.environment
 }
 
+module "spaces" {
+  source = "../../modules/spaces"
+  
+  frontend_bucket_name = "${var.app_name}-frontend-${var.environment}"
+  admin_bucket_name    = "${var.app_name}-admin-${var.environment}"
+  region              = "ams3"
+}
+
 module "apps" {
   source = "../../modules/k8s-apps"
   
@@ -43,9 +51,7 @@ module "apps" {
   aws_cognito_client_secret = var.aws_cognito_client_secret
   openai_api_key           = var.openai_api_key
   backend_image            = var.backend_image
-  frontend_image           = var.frontend_image
-  admin_image              = var.admin_image
   backend_replicas         = 2
-  frontend_replicas        = 2
-  admin_replicas           = 1
+  frontend_bucket_domain   = module.spaces.frontend_bucket_domain
+  admin_bucket_domain      = module.spaces.admin_bucket_domain
 }

@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-// Removed regex and date parsing imports - now using LLM extraction
 
-import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -299,17 +297,23 @@ public class EmagineProvider extends AbstractProvider {
                   return skillRepository.save(newSkill);
                 } catch (Exception e) {
                   // If save fails (likely due to unique constraint), try to find it again
-                  return skillRepository.findByNameIgnoreCase(skillName)
-                      .orElseThrow(() -> new RuntimeException(
-                          "Failed to create or find skill: " + skillName, e));
+                  return skillRepository
+                      .findByNameIgnoreCase(skillName)
+                      .orElseThrow(
+                          () ->
+                              new RuntimeException(
+                                  "Failed to create or find skill: " + skillName, e));
                 }
               });
     } catch (Exception e) {
       log.warn("Error in findOrCreateSkill for skill {}: {}", skillName, e.getMessage());
       // Last attempt - try to get by name one more time
-      return skillRepository.findByNameIgnoreCase(skillName)
-          .orElseThrow(() -> new RuntimeException(
-              "Failed to create or find skill after retrying: " + skillName, e));
+      return skillRepository
+          .findByNameIgnoreCase(skillName)
+          .orElseThrow(
+              () ->
+                  new RuntimeException(
+                      "Failed to create or find skill after retrying: " + skillName, e));
     }
   }
 
@@ -383,21 +387,36 @@ public class EmagineProvider extends AbstractProvider {
           .orElseGet(
               () -> {
                 try {
-                  StatusType newStatus = StatusType.builder().name(name).entityType(entityType).build();
+                  StatusType newStatus =
+                      StatusType.builder().name(name).entityType(entityType).build();
                   return statusTypeRepository.save(newStatus);
                 } catch (Exception e) {
                   // If save fails (likely due to unique constraint), try to find it again
-                  return statusTypeRepository.findByNameAndEntityType(name, entityType)
-                      .orElseThrow(() -> new RuntimeException(
-                          "Failed to create or find status type: " + name + ":" + entityType, e));
+                  return statusTypeRepository
+                      .findByNameAndEntityType(name, entityType)
+                      .orElseThrow(
+                          () ->
+                              new RuntimeException(
+                                  "Failed to create or find status type: "
+                                      + name
+                                      + ":"
+                                      + entityType,
+                                  e));
                 }
               });
     } catch (Exception e) {
       logger.warn("Error in getOrCreateStatusType for {}:{}: {}", name, entityType, e.getMessage());
       // Last attempt - try to get by name and type one more time
-      return statusTypeRepository.findByNameAndEntityType(name, entityType)
-          .orElseThrow(() -> new RuntimeException(
-              "Failed to create or find status type after retrying: " + name + ":" + entityType, e));
+      return statusTypeRepository
+          .findByNameAndEntityType(name, entityType)
+          .orElseThrow(
+              () ->
+                  new RuntimeException(
+                      "Failed to create or find status type after retrying: "
+                          + name
+                          + ":"
+                          + entityType,
+                      e));
     }
   }
 }

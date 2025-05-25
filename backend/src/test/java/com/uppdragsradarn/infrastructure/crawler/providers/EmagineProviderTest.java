@@ -18,9 +18,8 @@ import com.uppdragsradarn.domain.repository.SourceTypeRepository;
 import com.uppdragsradarn.domain.repository.StatusTypeRepository;
 
 /**
- * Tests for EmagineProvider.
- * Note: Complex extraction tests have been moved to LlmJobExtractionServiceTest
- * as the regex-based extraction has been replaced by LLM processing.
+ * Tests for EmagineProvider. Note: Complex extraction tests have been moved to
+ * LlmJobExtractionServiceTest as the regex-based extraction has been replaced by LLM processing.
  */
 class EmagineProviderTest {
 
@@ -66,7 +65,7 @@ class EmagineProviderTest {
     assertThat(emagineProvider.getName()).isEqualTo("Emagine Provider");
     assertThat(emagineProvider.supports(emagineSource)).isTrue();
   }
-  
+
   @Test
   void getName_shouldReturnCorrectProviderName() {
     assertThat(emagineProvider.getName()).isEqualTo("Emagine Provider");
@@ -79,11 +78,9 @@ class EmagineProviderTest {
 
   @Test
   void supports_shouldReturnTrueForSourceWithEmagineInUrl() {
-    Source sourceWithEmagineUrl = Source.builder()
-        .name("Other Source")
-        .baseUrl("https://emagine-consulting.se/jobs")
-        .build();
-    
+    Source sourceWithEmagineUrl =
+        Source.builder().name("Other Source").baseUrl("https://emagine-consulting.se/jobs").build();
+
     assertThat(emagineProvider.supports(sourceWithEmagineUrl)).isTrue();
   }
 

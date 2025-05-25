@@ -1,7 +1,6 @@
 package com.uppdragsradarn.infrastructure.crawler.providers;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,8 +22,8 @@ import com.uppdragsradarn.domain.repository.StatusTypeRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Provider for Biolit consulting assignments.
- * Biolit specializes in IT consulting with focus on BI, data, and development.
+ * Provider for Biolit consulting assignments. Biolit specializes in IT consulting with focus on BI,
+ * data, and development.
  */
 @Component
 @Slf4j
@@ -33,8 +32,9 @@ public class BiolitProvider extends AbstractHttpProvider {
   private static final String LISTINGS_URL = "https://biolit.se/konsultuppdrag/";
   private static final Pattern JOB_NUMBER_PATTERN = Pattern.compile("Uppdragsnummer:\\s*(\\d+)");
   private static final Pattern DATE_PATTERN = Pattern.compile("Inkom:\\s*(\\d{4}-\\d{2}-\\d{2})");
-  private static final Pattern EMAIL_PATTERN = Pattern.compile("([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})");
-  
+  private static final Pattern EMAIL_PATTERN =
+      Pattern.compile("([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})");
+
   private final LocationService locationService;
   private final SkillRepository skillRepository;
   private final CurrencyRepository currencyRepository;
@@ -69,14 +69,14 @@ public class BiolitProvider extends AbstractHttpProvider {
   @Override
   protected List<Assignment> fetchAndParse(Source source) throws CrawlerException {
     logger.info("Fetching assignments from Biolit: {}", LISTINGS_URL);
-    
+
     try {
       Document doc = fetchAndParseDocument(LISTINGS_URL);
       List<Assignment> assignments = new ArrayList<>();
-      
+
       // Find collapsible sections which contain job listings
       Elements collapsibleSections = doc.select(".collapsible");
-      
+
       // If no collapsible sections, try alternative structure
       if (collapsibleSections.isEmpty()) {
         // Look for content sections with specific patterns
@@ -87,9 +87,9 @@ public class BiolitProvider extends AbstractHttpProvider {
           }
         }
       }
-      
+
       logger.debug("Found {} potential job sections", collapsibleSections.size());
-      
+
       for (Element section : collapsibleSections) {
         try {
           Assignment assignment = extractAssignment(section, source);
@@ -100,15 +100,15 @@ public class BiolitProvider extends AbstractHttpProvider {
           logger.warn("Error extracting assignment from section: {}", e.getMessage());
         }
       }
-      
+
       // Also check for assignments in text blocks with specific patterns
       if (assignments.isEmpty()) {
         assignments = extractFromTextBlocks(doc, source);
       }
-      
+
       logger.info("Extracted {} assignments from Biolit", assignments.size());
       return assignments;
-      
+
     } catch (Exception e) {
       throw new CrawlerException("Failed to fetch Biolit listings", e);
     }
@@ -124,7 +124,7 @@ public class BiolitProvider extends AbstractHttpProvider {
     assignment.setSource(source);
     assignment.setActive(true);
     assignment.setStatus(getOrCreateStatusType("ACTIVE", "ASSIGNMENT"));
-    
+
     // Extract title - usually in bold or strong tags
     Element titleElement = section.selectFirst("strong, b");
     if (titleElement == null) {
@@ -139,7 +139,7 @@ public class BiolitProvider extends AbstractHttpProvider {
     } else {
       assignment.setTitle(titleElement.text().trim());
     }
-    
+
     // Extract job number
     String jobNumber = extractJobNumber(section);
     if (jobNumber != null) {
@@ -147,30 +147,31 @@ public class BiolitProvider extends AbstractHttpProvider {
     } else {
       assignment.setExternalId(generateIdFromTitle(assignment.getTitle()));
     }
-    
-    // Extract date
+
+    // Extract date - could be used for startDate if it represents when the assignment starts
     LocalDate incomingDate = extractDate(section);
     if (incomingDate != null) {
-      assignment.setPublishedDate(incomingDate);
+      // For now, we'll just log this - could be used for startDate based on business logic
+      logger.debug("Assignment {} was posted on {}", assignment.getTitle(), incomingDate);
     }
-    
+
     // Extract contact email for application URL
     String email = extractEmail(section);
     if (email != null) {
       assignment.setApplicationUrl("mailto:" + email + "?subject=" + assignment.getTitle());
     }
-    
+
     // Extract description - everything except metadata
     String description = extractDescription(section);
     assignment.setDescription(description);
-    
+
     // Set company name
     assignment.setCompanyName("Biolit");
-    
+
     // Extract location from description
     String location = extractLocationFromText(description);
     locationService.processAssignmentLocation(assignment, location, source.getName());
-    
+
     // Extract skills from title and description
     Set<String> skills = extractSkills(assignment.getTitle(), description);
     for (String skillName : skills) {
@@ -180,17 +181,17 @@ public class BiolitProvider extends AbstractHttpProvider {
         logger.debug("Could not add skill: {}", skillName);
       }
     }
-    
+
     return assignment;
   }
 
   private List<Assignment> extractFromTextBlocks(Document doc, Source source) {
     List<Assignment> assignments = new ArrayList<>();
     String content = doc.select(".content").text();
-    
+
     // Split by job number pattern
     String[] blocks = content.split("(?=Uppdragsnummer:)");
-    
+
     for (String block : blocks) {
       if (block.contains("Uppdragsnummer:")) {
         try {
@@ -203,7 +204,7 @@ public class BiolitProvider extends AbstractHttpProvider {
         }
       }
     }
-    
+
     return assignments;
   }
 
@@ -212,7 +213,7 @@ public class BiolitProvider extends AbstractHttpProvider {
     assignment.setSource(source);
     assignment.setActive(true);
     assignment.setStatus(getOrCreateStatusType("ACTIVE", "ASSIGNMENT"));
-    
+
     // Extract title (usually first line before metadata)
     String[] lines = block.split("\n");
     String title = "";
@@ -223,12 +224,12 @@ public class BiolitProvider extends AbstractHttpProvider {
         break;
       }
     }
-    
+
     if (title.isEmpty()) {
       return null;
     }
     assignment.setTitle(title);
-    
+
     // Extract metadata
     Matcher jobNumberMatcher = JOB_NUMBER_PATTERN.matcher(block);
     if (jobNumberMatcher.find()) {
@@ -236,36 +237,38 @@ public class BiolitProvider extends AbstractHttpProvider {
     } else {
       assignment.setExternalId(generateIdFromTitle(title));
     }
-    
+
     Matcher dateMatcher = DATE_PATTERN.matcher(block);
     if (dateMatcher.find()) {
       try {
-        assignment.setPublishedDate(LocalDate.parse(dateMatcher.group(1)));
+        LocalDate postedDate = LocalDate.parse(dateMatcher.group(1));
+        // For now, we'll just log this - could be used for startDate based on business logic
+        logger.debug("Assignment {} was posted on {}", title, postedDate);
       } catch (Exception e) {
         logger.debug("Could not parse date: {}", dateMatcher.group(1));
       }
     }
-    
+
     Matcher emailMatcher = EMAIL_PATTERN.matcher(block);
     if (emailMatcher.find()) {
       String email = emailMatcher.group(1);
       assignment.setApplicationUrl("mailto:" + email + "?subject=" + title);
     }
-    
+
     // Clean description
     String description = block;
     description = description.replaceAll("Inkom:\\s*\\d{4}-\\d{2}-\\d{2}", "");
     description = description.replaceAll("Uppdragsnummer:\\s*\\d+", "");
     description = description.replaceAll(EMAIL_PATTERN.pattern(), "");
     description = description.replace(title, "").trim();
-    
+
     assignment.setDescription(description);
     assignment.setCompanyName("Biolit");
-    
+
     // Extract location
     String location = extractLocationFromText(description);
     locationService.processAssignmentLocation(assignment, location, source.getName());
-    
+
     // Extract skills
     Set<String> skills = extractSkills(title, description);
     for (String skillName : skills) {
@@ -275,7 +278,7 @@ public class BiolitProvider extends AbstractHttpProvider {
         logger.debug("Could not add skill: {}", skillName);
       }
     }
-    
+
     return assignment;
   }
 
@@ -307,130 +310,192 @@ public class BiolitProvider extends AbstractHttpProvider {
     if (matcher.find()) {
       return matcher.group(1);
     }
-    
+
     // Also check for email links
     Element emailLink = element.selectFirst("a[href^=mailto:]");
     if (emailLink != null) {
       String mailto = emailLink.attr("href");
       return mailto.replace("mailto:", "").split("\\?")[0];
     }
-    
+
     return null;
   }
 
   private String extractDescription(Element element) {
     String text = element.text();
-    
+
     // Remove metadata
     text = text.replaceAll("Inkom:\\s*\\d{4}-\\d{2}-\\d{2}", "");
     text = text.replaceAll("Uppdragsnummer:\\s*\\d+", "");
     text = text.replaceAll("Kontakt:.*", "");
     text = text.replaceAll(EMAIL_PATTERN.pattern(), "");
-    
+
     // Clean up
     text = text.replaceAll("\\s+", " ").trim();
-    
+
     // Limit length
     if (text.length() > 5000) {
       text = text.substring(0, 5000) + "...";
     }
-    
+
     return text;
   }
 
   private String extractLocationFromText(String text) {
     String lowercaseText = text.toLowerCase();
-    
+
     // Common Swedish cities
     String[] cities = {
-        "stockholm", "göteborg", "gothenburg", "malmö", "uppsala", "västerås",
-        "örebro", "linköping", "helsingborg", "jönköping", "norrköping",
-        "lund", "umeå", "gävle", "borås", "södertälje", "eskilstuna"
+      "stockholm",
+      "göteborg",
+      "gothenburg",
+      "malmö",
+      "uppsala",
+      "västerås",
+      "örebro",
+      "linköping",
+      "helsingborg",
+      "jönköping",
+      "norrköping",
+      "lund",
+      "umeå",
+      "gävle",
+      "borås",
+      "södertälje",
+      "eskilstuna"
     };
-    
+
     for (String city : cities) {
       if (lowercaseText.contains(city)) {
         return city.substring(0, 1).toUpperCase() + city.substring(1);
       }
     }
-    
+
     // Check for remote indicators
-    if (lowercaseText.contains("distans") || lowercaseText.contains("remote") || 
-        lowercaseText.contains("hemma")) {
+    if (lowercaseText.contains("distans")
+        || lowercaseText.contains("remote")
+        || lowercaseText.contains("hemma")) {
       return "Remote";
     }
-    
+
     // Check for region mentions
     if (lowercaseText.contains("hela sverige")) {
       return "Sweden";
     }
-    
+
     return "Sweden";
   }
 
   private Set<String> extractSkills(String title, String description) {
     Set<String> skills = new HashSet<>();
     String combined = (title + " " + description).toLowerCase();
-    
+
     // BI and data related skills
     String[] dataSkills = {
-        "bi", "business intelligence", "sas", "sql", "data warehouse", "dwh",
-        "etl", "power bi", "tableau", "qlik", "qliksense", "qlikview",
-        "oracle", "microsoft sql server", "mysql", "postgresql", "snowflake",
-        "azure", "aws", "databricks", "spark", "hadoop", "python", "r",
-        "data modeling", "dimensional modeling", "kimball", "inmon",
-        "ssas", "ssis", "ssrs", "mdx", "dax", "data lake", "data governance"
+      "bi",
+      "business intelligence",
+      "sas",
+      "sql",
+      "data warehouse",
+      "dwh",
+      "etl",
+      "power bi",
+      "tableau",
+      "qlik",
+      "qliksense",
+      "qlikview",
+      "oracle",
+      "microsoft sql server",
+      "mysql",
+      "postgresql",
+      "snowflake",
+      "azure",
+      "aws",
+      "databricks",
+      "spark",
+      "hadoop",
+      "python",
+      "r",
+      "data modeling",
+      "dimensional modeling",
+      "kimball",
+      "inmon",
+      "ssas",
+      "ssis",
+      "ssrs",
+      "mdx",
+      "dax",
+      "data lake",
+      "data governance"
     };
-    
+
     // Development skills
     String[] devSkills = {
-        "java", "c#", ".net", "javascript", "typescript", "react", "angular",
-        "spring", "microservices", "api", "rest", "soap", "integration",
-        "devops", "ci/cd", "docker", "kubernetes", "git", "agile", "scrum"
+      "java",
+      "c#",
+      ".net",
+      "javascript",
+      "typescript",
+      "react",
+      "angular",
+      "spring",
+      "microservices",
+      "api",
+      "rest",
+      "soap",
+      "integration",
+      "devops",
+      "ci/cd",
+      "docker",
+      "kubernetes",
+      "git",
+      "agile",
+      "scrum"
     };
-    
+
     // Check for skills
     for (String skill : dataSkills) {
       if (combined.contains(skill)) {
         skills.add(skill.toUpperCase().replace(" ", "_"));
       }
     }
-    
+
     for (String skill : devSkills) {
       if (combined.contains(skill)) {
         skills.add(skill.toUpperCase().replace(" ", "_"));
       }
     }
-    
+
     return skills;
   }
 
   private String generateIdFromTitle(String title) {
-    return "biolit-" + title.toLowerCase()
-        .replaceAll("[^a-z0-9]+", "-")
-        .replaceAll("^-|-$", "");
+    return "biolit-" + title.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
   }
 
-  private com.uppdragsradarn.domain.model.StatusType getOrCreateStatusType(String name, String entityType) {
+  private com.uppdragsradarn.domain.model.StatusType getOrCreateStatusType(
+      String name, String entityType) {
     return statusTypeRepository
         .findByNameAndEntityType(name, entityType)
-        .orElseGet(() -> {
-          var newStatus = com.uppdragsradarn.domain.model.StatusType.builder()
-              .name(name)
-              .entityType(entityType)
-              .build();
-          return statusTypeRepository.save(newStatus);
-        });
+        .orElseGet(
+            () -> {
+              var newStatus =
+                  com.uppdragsradarn.domain.model.StatusType.builder()
+                      .name(name)
+                      .entityType(entityType)
+                      .build();
+              return statusTypeRepository.save(newStatus);
+            });
   }
 
   private com.uppdragsradarn.domain.model.Skill findOrCreateSkill(String skillName) {
     return skillRepository
         .findByNameIgnoreCase(skillName)
-        .orElseGet(() -> {
-          var newSkill = com.uppdragsradarn.domain.model.Skill.builder()
-              .name(skillName)
-              .build();
-          return skillRepository.save(newSkill);
-        });
+        .orElseGet(
+            () -> {
+              var newSkill =
+                  com.uppdragsradarn.domain.model.Skill.builder().name(skillName).build();
+              return skillRepository.save(newSkill);
+            });
   }
 }
