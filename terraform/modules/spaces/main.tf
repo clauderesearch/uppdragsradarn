@@ -75,6 +75,7 @@ resource "digitalocean_spaces_bucket_cors_configuration" "admin" {
 
 # CDN endpoint for frontend
 resource "digitalocean_cdn" "frontend" {
+  count            = var.frontend_custom_domain != null ? 1 : 0
   origin           = digitalocean_spaces_bucket.frontend.bucket_domain_name
   custom_domain    = var.frontend_custom_domain
   certificate_name = var.certificate_name
@@ -83,6 +84,7 @@ resource "digitalocean_cdn" "frontend" {
 
 # CDN endpoint for admin
 resource "digitalocean_cdn" "admin" {
+  count            = var.admin_custom_domain != null ? 1 : 0
   origin           = digitalocean_spaces_bucket.admin.bucket_domain_name
   custom_domain    = var.admin_custom_domain
   certificate_name = var.certificate_name

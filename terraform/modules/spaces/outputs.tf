@@ -20,10 +20,10 @@ output "admin_bucket_domain" {
 
 output "frontend_cdn_endpoint" {
   description = "CDN endpoint for frontend"
-  value       = digitalocean_cdn.frontend.endpoint
+  value       = var.frontend_custom_domain != null ? digitalocean_cdn.frontend[0].endpoint : null
 }
 
 output "admin_cdn_endpoint" {
   description = "CDN endpoint for admin"
-  value       = digitalocean_cdn.admin.endpoint
+  value       = var.admin_custom_domain != null ? digitalocean_cdn.admin[0].endpoint : null
 }
